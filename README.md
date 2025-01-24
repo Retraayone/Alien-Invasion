@@ -1,17 +1,17 @@
 # Alien-Invasion
 
-#Requirements
+# Requirements
 - Python
 - Code compiler(eg.VsCode)
 - Pygame library
 
-#How to use
+# How to use
 -download the .zip file from the release.
 -Unzip the file and open alien_invasion.py
 -run it.
 
 
-#How to Play
+# How to Play
 -Left arrow key = move left
 -Right arrow key = move right
 -Space = Shoot
