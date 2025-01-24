@@ -1,5 +1,5 @@
 # Alien-Invasion
-
+A space shooter game made using Pygame
 # Requirements
 - Python
 - Code compiler(eg.VsCode)
