@@ -16,4 +16,4 @@ A space shooter game made using Pygame
 - Right arrow key = move right
 - Space = Shoot
 
-!!!SAVE THE UNIVERSE FROM THE EVIL ALIENS!!!
+!!!SAVE THE UNIVERSE FROM EVIL ALIENS!!!
