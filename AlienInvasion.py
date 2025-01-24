@@ -20,6 +20,7 @@ class AlienInvasion:
         pygame.init()
         
         self.game_active = False  # Start the game in an inactive state
+        self.paused = False  # Add a paused state
         self.clock = pygame.time.Clock()
         self.settings = Settings()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -41,11 +42,26 @@ class AlienInvasion:
         # Create an instance to store the scoreboard
         self.sb = Scoreboard(self)
 
+        # Initialize the mixer
+        pygame.mixer.init()
+
+        # Load sounds
+        self.background_music = pygame.mixer.Sound('assets/sounds/background_music.mp3')
+        self.laser_shot_sound = pygame.mixer.Sound('assets/sounds/laser_shot.wav')
+        self.enemy_hit_sound = pygame.mixer.Sound('assets/sounds/enemy_hit.wav')
+        self.game_over_sound = pygame.mixer.Sound('assets/sounds/game_over.wav')
+
+        # Set volume for background music
+        self.background_music.set_volume(0.1)  # Set volume to 20%
+
+        # Play background music in a loop
+        self.background_music.play(loops=-1)
+
     def run_game(self):
         """Start the main loop for the game"""
         while True:
             self._check_events()
-            if self.game_active:
+            if self.game_active and not self.paused:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()  # Update aliens' positions
@@ -75,6 +91,16 @@ class AlienInvasion:
             sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullets()
+        elif event.key == pygame.K_p or event.key == pygame.K_ESCAPE:
+            self._toggle_pause()  # Toggle pause state
+
+    def _toggle_pause(self):
+        """Toggle the game's paused state."""
+        self.paused = not self.paused
+        if self.paused:
+            pygame.mixer.pause()  # Pause all sounds
+        else:
+            pygame.mixer.unpause()  # Unpause all sounds
 
     def _check_keyup_events(self, event):
         """Respond to key releases."""
@@ -112,6 +138,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            self.laser_shot_sound.play()  # Play laser shot sound
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets."""
@@ -134,6 +161,8 @@ class AlienInvasion:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+                self.enemy_hit_sound.play()  # Play enemy hit sound
+
             self.sb.prep_score()
             self._check_high_score()
 
@@ -237,6 +266,7 @@ class AlienInvasion:
         else:
             self.game_active = False
             pygame.mouse.set_visible(True)
+            self.game_over_sound.play()  # Play game over sound
 
     def update_screen(self):
         """Update images and flip to the new screen."""
@@ -251,7 +281,17 @@ class AlienInvasion:
             self.play_button.draw_button()
         # Draw the score information.
         self.sb.show_score()
+        # Display pause message if the game is paused.
+        if self.paused:
+            self._show_pause_message()
         pygame.display.flip()
+
+    def _show_pause_message(self):
+        """Display a pause message on the screen."""
+        font = pygame.font.SysFont(None, 74)
+        pause_message = font.render("Paused", True, (255, 255, 255))
+        pause_rect = pause_message.get_rect(center=self.screen.get_rect().center)
+        self.screen.blit(pause_message, pause_rect)
 
 if __name__ == '__main__':
     # Make an instance and run the game
